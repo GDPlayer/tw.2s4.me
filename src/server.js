@@ -10,7 +10,12 @@ var express = require("express");
 var path = require("path"); // essential
 const { notDeepEqual } = require("assert");
 var anonymous = [] // so suspicious!
-var settings = JSON.parse(fs.readFileSync("../data/settings.json"));
+
+let customSettingsPath = process.argv[2];
+var settings = JSON.parse(fs.readFileSync(
+	(customSettingsPath && customSettingsPath.includes("/")) ? customSettingsPath :
+	"../data/settings.json"
+));
 
 console.log("Starting server...");
 
@@ -1040,7 +1045,7 @@ async function runserver() {
 	}, { get: true });
 	const adminPath = path.join(__dirname, "../admin");
 	twrApp.use("/admin", express.static(adminPath));
-	twrApp.get(/^\/admin(\/.*)?$/, (req, res) => {
+	/*twrApp.get(/^\/admin(\/.*)?$/, (req, res) => {
 		const requestedFile = path.join(adminPath, req.path.replace("/admin/", ""));
 
 		fs.access(requestedFile, fs.constants.F_OK, (err) => {
@@ -1052,7 +1057,7 @@ async function runserver() {
 				res.sendFile(requestedFile);
 			}
 		});
-	});
+	});*/
 	if (settings.useStatic) {
 		twrApp.use(express.static(staticPath));
 	}

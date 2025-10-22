@@ -14,7 +14,7 @@ var anonymous = [] // so suspicious!
 let customSettingsPath = process.argv[2];
 var settings = JSON.parse(fs.readFileSync(
 	(customSettingsPath && customSettingsPath.includes("/")) ? customSettingsPath :
-		"../data/settings.json"
+	"../data/settings.json"
 ));
 
 console.log("Starting server...");
@@ -1045,10 +1045,8 @@ async function runserver() {
 	}, { get: true });
 	const adminPath = path.join(__dirname, "../admin");
 	twrApp.use("/admin", express.static(adminPath));
-	twrApp.get(/^\/admin(\/.*)?$/, (req, res) => {
-		// remove leading "/admin/" and leading slash, so attackers can't use traversal paths
-		let rel = req.path.replace(/^\/admin\/?/, '');
-		if (!rel) rel = 'index.html';
+	/*twrApp.get(/^\/admin(\/.*)?$/, (req, res) => {
+		const requestedFile = path.join(adminPath, req.path.replace("/admin/", ""));
 
 		// express will resolve against root and prevent escaping it
 		res.sendFile(rel, { root: adminPath }, (err) => {
@@ -1056,7 +1054,7 @@ async function runserver() {
 				return res.sendFile('index.html', { root: adminPath });
 			}
 		});
-	});
+	});*/
 	if (settings.useStatic) {
 		twrApp.use(express.static(staticPath));
 	}

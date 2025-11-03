@@ -603,7 +603,7 @@ function mask_ip(ip) {
 		return ip.replace(/^(\d+)\.\d+\.\d+\.\d+$/, "$1.X.X.X");
 	}
 }
-const WHITELIST_FILE = "../data/whitelist.json";
+const WHITELIST_FILE = settings.db.whitelistPath
 
 function loadWhitelist() {
 	try {

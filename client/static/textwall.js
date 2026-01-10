@@ -1112,50 +1112,29 @@
                     }
                 }
                 )),
-                w.moveCursor = function (direction, amount) {
-                    switch (direction) {
-                        case "up":
-                            Ce.y -= amount;
-                            break;
-                        case "down":
-                            Ce.y += amount;
-                            break;
-                        case "left":
-                            Ce.x -= amount;
-                            break;
-                        case "right":
-                            Ce.x += amount;
-                            break;
-                        default:
-                            throw "Invalid direction";
-                            break;
-                    }
-                    nr();
-                    ie(false);
-                    window.w.emit("cursormove", [Ce.x, Ce.y]);
-                };
+                
                 i[n(216)](n(689), (function (e) {
                     var t = n;
                     if (e[t(294)]) {
                         switch (e[t(232)]) {
                             case 38:
-                                w.moveCursor("up", 1);
+                                window.w.moveCursor("up", 1);
                                 e.preventDefault();
                                 break;
                             case 40:
-                                w.moveCursor("down", 1);
+                                window.w.moveCursor("down", 1);
                                 e.preventDefault();
                                 break;
                             case 37:
-                                w.moveCursor("left", 1);
+                                window.w.moveCursor("left", 1);
                                 e.preventDefault();
                                 break;
                             case 39:
-                                w.moveCursor("right", 1);
+                                window.w.moveCursor("right", 1);
                                 e.preventDefault();
                                 break;
                             case 9:
-                                w.moveCursor("right", 3);
+                                window.w.moveCursor("right", 3);
                                 e.preventDefault();
                                 break;
                             case 36:
@@ -1991,6 +1970,38 @@
                     }
                 }
             }
+            window.w.moveCursor = function (direction, amount, doNotAutoPan) {
+                switch (direction) {
+                    case "up":
+                        Ce.y -= amount;
+                        break;
+                    case "down":
+                        Ce.y += amount;
+                        break;
+                    case "left":
+                        Ce.x -= amount;
+                        break;
+                    case "right":
+                        Ce.x += amount;
+                        break;
+                    default:
+                        throw "Invalid direction";
+                        break;
+                }
+                nr();
+                ie(false);
+                window.w.emit("cursormove", [Ce.x, Ce.y]);
+                if (!doNotAutoPan) Hn();
+            };
+            window.w.moveCursorTo = function(x, y, doNotAutoPan) {
+                Ce.x = x;
+                Ce.y = y;
+                Ce.start = x;
+                nr();
+                ie(false);
+                window.w.emit("cursormove", [Ce.x, Ce.y]);
+                if (!doNotAutoPan) Hn();
+            };
             function parseColoredMessage(msg) {
                 const regex = /<start\s+(#[0-9a-fA-F]{3,6})>([\s\S]*?)<end>/g;
                 const container = document.createElement("span");

@@ -1863,7 +1863,7 @@ function init_ws() {
 				// never send if on anonymous mode
 				if (anonymous.includes(sdata.clientId.toLowerCase())) return;
 				if (sdata.worldAttr.private && !sdata.isMember) return;
-				if (!sdata.isAuthenticated || !isWhitelisted(sdata.authUser)) {
+				if (!isWhitelisted(sdata.authUser)) {
 					return;
 				}
 

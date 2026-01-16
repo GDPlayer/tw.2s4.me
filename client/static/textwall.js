@@ -1112,39 +1112,30 @@
                     }
                 }
                 )),
+                
                 i[n(216)](n(689), (function (e) {
                     var t = n;
                     if (e[t(294)]) {
                         switch (e[t(232)]) {
                             case 38:
-                                Ce.y -= 1,
-                                    nr(),
-                                    ie(!1),
-                                    e[t(423)]();
+                                window.w.moveCursor("up", 1);
+                                e.preventDefault();
                                 break;
                             case 40:
-                                Ce.y += 1,
-                                    nr(),
-                                    ie(!1),
-                                    e[t(423)]();
+                                window.w.moveCursor("down", 1);
+                                e.preventDefault();
                                 break;
                             case 37:
-                                Ce.x -= 1,
-                                    nr(),
-                                    ie(!1),
-                                    e.preventDefault();
+                                window.w.moveCursor("left", 1);
+                                e.preventDefault();
                                 break;
                             case 39:
-                                Ce.x += 1,
-                                    nr(),
-                                    ie(!1),
-                                    e[t(423)]();
+                                window.w.moveCursor("right", 1);
+                                e.preventDefault();
                                 break;
                             case 9:
-                                Ce.x += 3,
-                                    nr(),
-                                    ie(!1),
-                                    e.preventDefault();
+                                window.w.moveCursor("right", 3);
+                                e.preventDefault();
                                 break;
                             case 36:
                                 Ce.x = Ce[t(258)],
@@ -1171,9 +1162,11 @@
                             , a = ce()
                             , o = Zr(n[3]);
                         pe = o[0],
+                            window.color = pe,
                             le(o[1]),
                             Vn(n[2], 0, !0) || Be.unshift(n),
                             pe = r,
+                            window.color = pe,
                             le(a)
                     }
                 },
@@ -1196,9 +1189,11 @@
                                             , a = ce()
                                             , o = Zr(t[3]);
                                         pe = o[0],
+                                            window.color = pe,
                                             le(o[1]),
                                             Vn(t[2], 1, !1) || Fe[e(343)](t),
                                             pe = n,
+                                            window.color = pe,
                                             le(a)
                                     }
                                 }(),
@@ -1931,7 +1926,7 @@
 
             let hue = 0;
             window.w = {};
-
+            window.position = qe;
             window.elem = tt;
             window.w.events = {};
             window.w.on = function (e, t) {
@@ -1979,6 +1974,38 @@
                     }
                 }
             }
+            window.w.moveCursor = function (direction, amount, doNotAutoPan) {
+                switch (direction) {
+                    case "up":
+                        Ce.y -= amount;
+                        break;
+                    case "down":
+                        Ce.y += amount;
+                        break;
+                    case "left":
+                        Ce.x -= amount;
+                        break;
+                    case "right":
+                        Ce.x += amount;
+                        break;
+                    default:
+                        throw "Invalid direction";
+                        break;
+                }
+                nr();
+                ie(false);
+                window.w.emit("cursormove", [Ce.x, Ce.y]);
+                if (!doNotAutoPan) Hn();
+            };
+            window.w.moveCursorTo = function(x, y, doNotAutoPan) {
+                Ce.x = x;
+                Ce.y = y;
+                Ce.start = x;
+                nr();
+                ie(false);
+                window.w.emit("cursormove", [Ce.x, Ce.y]);
+                if (!doNotAutoPan) Hn();
+            };
             function parseColoredMessage(msg) {
                 const regex = /<start\s+(#[0-9a-fA-F]{3,6})>([\s\S]*?)<end>/g;
                 const container = document.createElement("span");
@@ -3056,6 +3083,7 @@
                 var r = document.getElementById(pe);
                 r[t(676)][t(627)](t(594)),
                     pe = e,
+                    window.color = pe,
                     be = xe && 0 == pe ? "rgba(255, 255, 255, 0.6)" : Yr(se[pe], .6),
                     (r = document[t(628)](pe))[t(676)][t(608)](t(594)),
                     r[t(214)] < w[t(403)] + 36 && (w[t(403)] = r[t(214)] - 36),

@@ -3263,6 +3263,7 @@ function init_ws() {
 					return;
 				}
 				if (!sdata.isAuthenticated && sdata.worldAttr.regonly) return;
+				if (!sdata.isAuthenticated && adminSettings.l) return;
 
 				if ("l" in data.ce) {
 					var x = data.ce.l[0];
@@ -3305,6 +3306,11 @@ function init_ws() {
 					return;
 				}
 				if (sdata.worldAttr.regonly && !sdata.isAuthenticated) return;
+				if (!sdata.isAuthenticated && adminSettings.l) {
+					send(ws, encodeMsgpack({
+						alert: "Log in to type/edit or send message."
+					}))
+				}
 
 				if (sdata.worldAttr.readonly && !sdata.isMember) return;
 				if (sdata.worldAttr.private && !sdata.isMember) return;
@@ -3383,6 +3389,11 @@ function init_ws() {
 
 				if (sdata.worldAttr.disableChat && !sdata.isMember && sdata.worldAttr.readonly) return;
 				if (!sdata.isAuthenticated && sdata.worldAttr.regonly) return;
+				if (!sdata.isAuthenticated && adminSettings.l) {
+					send(ws, encodeMsgpack({
+						alert: "Log in to type/edit or send message."
+					}))
+				}
 
 				const isMuted = chatMutesByIP[sdata.ipAddr] || (sdata.isAuthenticated && chatMutesByUserIDs[sdata.authUserId]);
 				if (isMuted && sdata.authUser !== "textwall" && !isAdmin) {

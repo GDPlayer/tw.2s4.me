@@ -6,7 +6,7 @@
         "j": 8,
         "r": 7,
         "ce": 22,
-        "e": 77,
+        "e": 512,
         "msg": 2,
         "register": 1,
         "login": 2,
@@ -55,6 +55,6 @@
     },
     "max_scripts": 6,
     "discordWebhooks": {
-        "report": "https://discord.com/api/webhooks/1501224431429750824/zTwtiL4lKXhFJWy2nRCVS_xdOSFQexrdp4iIih_01kYQ7DWUWmt4gdIVKf_cMtwaerX3"
+        "report": ""
     }
 }

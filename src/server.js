@@ -1203,7 +1203,7 @@ async function runserver() {
 		res.json(wl);
 	}, { get: true })
 	// STARTER SCRIPTS
-	const STARTER_SCRIPTS_DIR = settings.db.starterScriptsPath
+	const STARTER_SCRIPTS_DIR = settings.db.starterScriptsPath;
 	createAdminRequest(".ss", (req, res) => {
 		const scripts = {};
 
@@ -1993,7 +1993,7 @@ async function runserver() {
 			res.status(404).json({ success: false, error: "Not Found" });
 		}
 	});
-	var WORLD_SCRIPTS_DIR = settings.db.worldScriptsPath
+	var WORLD_SCRIPTS_DIR = settings.db.worldScriptsPath;
 	// .ws/:script
 	twrApp.get(/^\/\.ws\/(.+)$/, (req, res) => {
 		const scriptPath = req.params[0];
@@ -3293,11 +3293,12 @@ function init_ws() {
 					send(ws, encodeMsgpack({ alert: "You are muted in canvas" }));
 					return;
 				}
-				if (!sdata.isAuthenticated || !isWhitelisted(sdata.authUser)) {send(ws, encodeMsgpack({
-						alert: "You are not authorized"
+				if (sdata.worldAttr.regonly && !sdata.isAuthenticated) return;
+				if (!sdata.isAuthenticated && adminSettings.l) {
+					send(ws, encodeMsgpack({
+						alert: "Log in to type/edit or send message."
 					}))
-					return;}
-		
+				}
 
 				if (sdata.worldAttr.readonly && !sdata.isMember) return;
 				if (sdata.worldAttr.private && !sdata.isMember) return;
@@ -3353,30 +3354,19 @@ function init_ws() {
 				worldBroadcast(sdata.connectedWorldId, encodeMsgpack({
 					e: { e: resp, clientId: sdata.clientId }
 				}));
-			} else if ("msg" == packetType) {
-				var message = data.msg;
+			}
+			else if (packetType === "msg") {
+				const rawMsg = data.msg;
+				let messageText;
+				let channel = "world";
 
-				if (typeof message != "string") return;
-				if (message.length > 256) return;
-				if (!sdata.isAuthenticated || !isWhitelisted(sdata.authUser)) {
-					send(ws, encodeMsgpack({
-						msg: ["[SERVER]", 4, "You are not authorized", true]
-					}));
-					return;
-				}
-
-				var nick = sdata.clientId;
-				if (sdata.isAuthenticated) {
-					nick = sdata.authUser;
-				}
-				if (sdata.worldAttr.disableChat && !sdata.isMember) {
-					return;
-				}
-
-				if ((chatMutesByIP[sdata.ipAddr] || (sdata.isAuthenticated && chatMutesByUserIDs[sdata.authUserId])) && (sdata.authUser != "textwall") && (!settings.adminList.includes(sdata.authUser))) {
-					send(ws, encodeMsgpack({
-						msg: ["[SERVER]", 4, "You are muted", true]
-					}));
+				if (typeof rawMsg === "string") {
+					messageText = rawMsg;
+				} else if (Array.isArray(rawMsg)) {
+					messageText = rawMsg[0];
+					const supplied = rawMsg[1];
+					channel = (typeof supplied === "string" && supplied.toLowerCase() === "global") ? "global" : "world";
+				} else {
 					return;
 				}
 
@@ -3694,7 +3684,7 @@ function init_ws() {
 			}
 			else if ("register" == packetType) {
 				if (sdata.isAuthenticated) return;
-				if (!sdata.isAuthenticated) {
+				if (!sdata.isAuthenticated && adminSettings.regclosed) {
 					send(ws, encodeMsgpack({
 						noreg: true
 					}))

@@ -2,6 +2,7 @@
 
 The original production code has been adapted to be runnable by a wider variety of willing instance operators for TWR (Textwall Ripoff). Contributions are welcome.
 
+
 ## Prerequisites
 1. Node.js (preferrably >= v20)
 
@@ -17,3 +18,5 @@ The original production code has been adapted to be runnable by a wider variety 
 - tw.2s4.me was created following its temporary shutdown in 2023
 - The server code was written from scratch based on acquired knowledge of the protocol
 
+## License
+MIT

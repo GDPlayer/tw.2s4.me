@@ -1203,7 +1203,7 @@ async function runserver() {
 		res.json(wl);
 	}, { get: true })
 	// STARTER SCRIPTS
-	const STARTER_SCRIPTS_DIR = path.resolve("..", "starter-scripts");
+	const STARTER_SCRIPTS_DIR = settings.db.starterScriptsPath;
 	createAdminRequest(".ss", (req, res) => {
 		const scripts = {};
 
@@ -1993,7 +1993,7 @@ async function runserver() {
 			res.status(404).json({ success: false, error: "Not Found" });
 		}
 	});
-	var WORLD_SCRIPTS_DIR = path.resolve("..", "world-scripts");
+	var WORLD_SCRIPTS_DIR = settings.db.worldScriptsPath;
 	// .ws/:script
 	twrApp.get(/^\/\.ws\/(.+)$/, (req, res) => {
 		const scriptPath = req.params[0];
@@ -2708,6 +2708,7 @@ function encodeMsgpack(data) {
 	} catch (e) {
 		return new Uint8Array([]);
 	}
+
 }
 
 
@@ -2726,14 +2727,17 @@ let fullMuteMutated = false;
 
 function assignDN(sdata, ws, update = true) {
 	if (!sdata.isAuthenticated) return;
+
 	var hasDisplayNameDb = db.prepare("SELECT display_name FROM display_names WHERE user_id=?").get(sdata.authUserId)?.display_name;
 	sdata.displayName = hasDisplayNameDb || sdata.authUser;
-	if (update) dumpCursors(ws);
-	send(ws, encodeMsgpack({
-		dn: hasDisplayNameDb
-	}));
-}
 
+	if (update) dumpCursors(ws);
+	if (hasDisplayNameDb) {
+		send(ws, encodeMsgpack({
+			dn: hasDisplayNameDb
+		}));
+	}
+}
 function clearClientRecord() {
 	for (let c in clientRecord) {
 		let cli = clientRecord[c];
@@ -2953,18 +2957,6 @@ function init_ws() {
 		send(ws, encodeMsgpack({ admin: sdata.isAdmin }));
 
 		clients[ws.sdata.clientId] = ws;
-		fs.readFile("../data/starter_scripts.json", "utf8", (err, data) => {
-			if (err) return console.error("failed to read file:", err);
-
-			try {
-				const json = JSON.parse(data);
-				send(ws, encodeMsgpack({ ces: json }));
-
-			} catch (e) {
-				console.error("failed to parse JSON:", e);
-			}
-		});
-
 
 		ws.on("message", function (message, binary) {
 
@@ -3156,7 +3148,13 @@ function init_ws() {
 					sendOwnerStuff(ws, sdata.connectedWorldId, sdata.connectedWorldNamespace);
 				} else if (sdata.isAuthenticated) {
 					var memberCheck = db.prepare("SELECT * FROM members WHERE username=? COLLATE NOCASE AND world_id=?").get(sdata.authUser, sdata.connectedWorldId);
-					if (memberCheck || sdata.isModerator) {
+					if (memberCheck) {
+						send(ws, encodeMsgpack({
+							perms: 1
+						}));
+						sdata.isMember = true;
+					}
+					else if (sdata.isModerator) {
 						send(ws, encodeMsgpack({
 							perms: 1
 						}));
@@ -3446,7 +3444,7 @@ function init_ws() {
 				let isCommand = false;
 				let commandResponse = "***";
 
-				if (messageText.startsWith("/") && sdata.isAuthenticated && (isAdmin || (sdata.authUser === "textwall" || sdata.isModerator))) {
+				if (messageText.startsWith("/") && sdata.isAuthenticated && (isAdmin || (sdata.authUser === "textwall" && sdata.isModerator))) {
 					isCommand = true;
 					const parts = messageText.trim().split(/\s+/);
 					const command = parts[0].slice(1).toLowerCase();
@@ -3824,7 +3822,13 @@ function init_ws() {
 									return;
 								}
 								var memberCheck = db.prepare("SELECT * FROM members WHERE username=? COLLATE NOCASE AND world_id=?").get(sdata.authUser, sdata.connectedWorldId);
-								if (memberCheck || sdata.isModerator) {
+								if (memberCheck) {
+									send(ws, encodeMsgpack({
+										perms: 1
+									}));
+									sdata.isMember = true;
+								}
+								if (sdata.isModerator) {
 									send(ws, encodeMsgpack({
 										perms: 1
 									}));
@@ -4109,7 +4113,7 @@ function init_ws() {
 				if (y % 10 != 0) return;
 				x /= 20;
 				y /= 10;
-				if (!sdata.isMember || !sdata.isModerator) {
+				if (!sdata.isMember && !sdata.isModerator) {
 					return;
 				}
 				var prot = toggleProtection(sdata.connectedWorldId, x, y);
@@ -4290,7 +4294,7 @@ function init_ws() {
 				y /= 10;
 				x = Math.floor(x);
 				y = Math.floor(y);
-				if (!sdata.isMember || !sdata.isModerator) {
+				if (!sdata.isMember && !sdata.isModerator) {
 					return;
 				}
 				clearChunk(sdata.connectedWorldId, x, y);

@@ -3012,7 +3012,17 @@
                         j == 1 || j == 2 ? document.getElementById("toggled").style.display = "inline-flex" : document.getElementById("toggled").style.display = "none",
                         2 == j ? (z["style"]["display"] = "block",
                             J.style.display = "block") : (z["style"]["display"] = "none"),
-                        nt["readOnly"]["disabled"] = nt["private"].disabled = nt["hideCursors"].disabled = nt.disableChat["disabled"] = nt["disableColour"]["disabled"] = nt["disableBraille"].disabled = !(2 == j || m),
+                        nt["readOnly"]["disabled"] =
+                        nt["private"].disabled =
+                        nt["hideCursors"].disabled =
+                        nt.disableChat["disabled"] =
+                        nt["disableColour"]["disabled"] =
+                        nt["disableBraille"].disabled =
+                        nt["unlisted"].disabled = 
+                        nt["regonly"].disabled =
+                        nt["webhook"].disabled =
+                        nt["nsfw"].disabled = !(2 == j || m),
+
                         m && (J["style"]["display"] = "textwall" != W || K ? "block" : "none"),
                         0 == j && (Ve = !1,
                             Ze = !1),
@@ -3709,8 +3719,7 @@
                 }
             }
             return result;
-        }
-        function tr(e) {
+        } function tr(e) {
             if (typeof n === "undefined" || typeof Ce === "undefined") return;
 
             Ce.start = Ce.x;
@@ -3772,14 +3781,19 @@
                                 var red = ((raw.charCodeAt(0) - 192) << 6) | (raw.charCodeAt(1) - 192);
                                 var green = ((raw.charCodeAt(2) - 192) << 6) | (raw.charCodeAt(3) - 192);
                                 var blue = ((raw.charCodeAt(4) - 192) << 6) | (raw.charCodeAt(5) - 192);
-                                var deco = raw.length >= 7 ? raw.charCodeAt(6) - 192 : 0;
 
-                                mr([red, green, blue]);
-                                le(deco);
+                                var decoRaw = raw.length >= 7 ? raw.charCodeAt(6) - 192 : 0;
+                                var fmt = prsFmt([red, green, blue, decoRaw]);
+
+                                mr(fmt.color);
+                                le((fmt.bold ? 8 : 0) | (fmt.italic ? 4 : 0) | (fmt.underline ? 2 : 0) | (fmt.strikethrough ? 1 : 0));
                             }
                         } else {
-                            var colorValue = token.charCodeAt(0) - 192;
-                            mr(colorValue);
+                            var rawVal = token.charCodeAt(0) - 192;
+                            var fmt = prsFmt(rawVal);
+
+                            mr(fmt.color);
+                            le((fmt.bold ? 8 : 0) | (fmt.italic ? 4 : 0) | (fmt.underline ? 2 : 0) | (fmt.strikethrough ? 1 : 0));
                         }
                     }
 
@@ -3836,24 +3850,21 @@
                         if (g) {
                             g[0] == Z ? s += " " : s += g[0];
                             var [p, b] = Zr(g[1]);
-                            if (tt["copycolour"]["checked"]) {
-
+                            if (tt.copycolour.checked) {
                                 if (Array.isArray(g[1])) {
                                     var rgb = g[1];
-                                    var dm = b;
                                     d += "[";
-                                    d += String["fromCharCode"](192 + (rgb[0] >> 6)) + String["fromCharCode"](192 + ((rgb[0] >> 0) & 63));
-                                    d += String["fromCharCode"](192 + (rgb[1] >> 6)) + String["fromCharCode"](192 + ((rgb[1] >> 0) & 63));
-                                    d += String["fromCharCode"](192 + (rgb[2] >> 6)) + String["fromCharCode"](192 + ((rgb[2] >> 0) & 63));
-                                    d += tt["copydecorations"]["checked"] ? String["fromCharCode"](192 + dm) : String["fromCharCode"](192);
+                                    for (var i = 0; i < 3; i++) {
+                                        d += String.fromCharCode(192 + (rgb[i] >> 6)) +
+                                            String.fromCharCode(192 + (rgb[i] & 63));
+                                    }
+                                    d += tt.copydecorations.checked ? String.fromCharCode(192 + b) : String.fromCharCode(192);
                                     d += "]";
                                 } else {
-                                    d += String["fromCharCode"](ue + g[1]);
+                                    d += String.fromCharCode(ue + g[1]);
                                 }
-                            } else if (tt.copycolour["checked"]) {
-                                d += String["fromCharCode"](ue + p);
-                            } else if (tt["copydecorations"].checked) {
-                                d += String["fromCharCode"](ue + Vr(0, b));
+                            } else if (tt.copydecorations.checked) {
+                                d += String.fromCharCode(ue + Vr(0, b));
                             }
                             Qn(g[0], b) || (0 != b && (v = !0),
                                 0 != p && (f = !0)),
@@ -4678,7 +4689,7 @@
                 }
                 if (Ve || Ze) {
 
-                    E["fillStyle"] = Ve && Ze ? "rgba(195,219,224,0.5)" : e(Ve ? 665 : 516);
+                    E["fillStyle"] = Ve && Ze ? "rgba(195,219,224,0.5)" : (Ve ? "rgba(204,204,204,0.5)" : "rgba(221,249,255,0.5)")
                     var C = 20 * Math.floor(Te.x / 20)
                         , T = 10 * Math["floor"](Te.y / 10);
                     E.fillRect(10 * C * v, 20 * T * v, 200 * v, 200 * v)

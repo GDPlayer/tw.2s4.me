@@ -31,17 +31,6 @@ function saveSettings() {
 	}
 }
 
-function sanitize(str) {
-    if (typeof str !== 'string') return '';
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;')
-        .replace(/\//g, '&#x2F;');
-}
-
 var ipBans = JSON.parse(fs.readFileSync(settings.db.ipBansPath));
 
 function saveIpBans() {
@@ -3687,10 +3676,7 @@ function init_ws() {
 				if (!isCommand) {
 					var isAdmin = settings.adminList.map(a => a.toLowerCase()).includes(sdata.authUser.toLowerCase());
 					if (!anonymous.includes(sdata.clientId.toLowerCase())) {
-
-                        const sanitizedMsg = sanitize(messageText);
-						const payloadObj = chatPayload(nick, sdata.cursorColor, sanitizedMsg, sdata.isAuthenticated, isAdmin, channel, sdata.displayName === nick ? null : sdata.displayName);
-
+						const payloadObj = chatPayload(nick, sdata.cursorColor, messageText, sdata.isAuthenticated, isAdmin, channel, sdata.displayName === nick ? null : sdata.displayName);
 						sendChannelEncoded(channel, payloadObj);
 					} else {
 						const payloadObj = chatPayload("???", 0, messageText, false, false, channel);

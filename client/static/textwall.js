@@ -2392,7 +2392,7 @@
 
                 const colorSpan = document.createElement("span");
                 colorSpan.style.color = match[1];
-                !html ? colorSpan.textContent = match[2] : colorSpan.textContent = match[2];
+                colorSpan.textContent = match[2];
                 container.appendChild(colorSpan);
 
                 lastIndex = regex.lastIndex;

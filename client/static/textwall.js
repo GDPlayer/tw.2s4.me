@@ -2376,7 +2376,7 @@
         }
 
 
-        function parseColoredMessage(msg, html = false) {
+        function parseColoredMessage(msg) {
             const regex = /<start\s+(#[0-9a-fA-F]{3,6})>([\s\S]*?)<end>/g;
             const container = document.createElement("span");
 
@@ -2473,7 +2473,7 @@
             }
 
             row.appendChild(nameLink);
-            row.appendChild(parseColoredMessage(" ~ " + msg, true));
+            row.appendChild(parseColoredMessage(" ~ " + msg));
 
             const isAtBottom = Math.abs(container.scrollHeight - container.scrollTop - container.clientHeight) < 2;
 
